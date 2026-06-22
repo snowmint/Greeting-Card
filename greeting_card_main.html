@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>祝賀卡片 Demo</title>
+
+  <style>
+    :root {
+      --card-width: min(88vw, 420px);
+      --card-height: 560px;
+      --main-red: #d94f4f;
+      --deep-red: #9f2f38;
+      --cream: #fff7eb;
+      --gold: #d9a441;
+      --text: #3f2f2f;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, #ffe3d3 0, transparent 30%),
+        radial-gradient(circle at bottom right, #f9c7c0 0, transparent 32%),
+        linear-gradient(135deg, #fff4df, #ffe3e3);
+      overflow: hidden;
+    }
+
+    #bg {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 28px 16px;
+    }
+
+    .hint {
+      position: absolute;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: max-content;
+      max-width: calc(100vw - 32px);
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.68);
+      backdrop-filter: blur(10px);
+      font-size: 14px;
+      letter-spacing: 0.04em;
+      box-shadow: 0 8px 24px rgba(126, 65, 65, 0.12);
+    }
+
+    .card {
+      width: var(--card-width);
+      height: var(--card-height);
+      perspective: 1400px;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .card-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      transition: transform 900ms cubic-bezier(.2, .8, .2, 1);
+      transform-style: preserve-3d;
+    }
+
+    .card.is-flipped .card-inner {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 28px;
+      overflow: hidden;
+      backface-visibility: hidden;
+      box-shadow:
+        0 28px 80px rgba(102, 40, 40, 0.25),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.55);
+    }
+
+    .card-front {
+      display: grid;
+      place-items: center;
+      padding: 34px;
+      background:
+        radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.42), transparent 28%),
+        linear-gradient(160deg, #ef6a62, #b93646 62%, #822634);
+      color: white;
+    }
+
+    .front-frame {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+      border: 2px solid rgba(255, 232, 176, 0.72);
+      border-radius: 22px;
+      text-align: center;
+      padding: 28px;
+      position: relative;
+    }
+
+    .front-frame::before,
+    .front-frame::after {
+      content: "";
+      position: absolute;
+      width: 76px;
+      height: 76px;
+      border: 2px solid rgba(255, 232, 176, 0.58);
+      border-radius: 50%;
+    }
+
+    .front-frame::before {
+      top: 22px;
+      left: 22px;
+    }
+
+    .front-frame::after {
+      right: 22px;
+      bottom: 22px;
+    }
+
+    .front-title {
+      font-size: clamp(36px, 9vw, 56px);
+      line-height: 1.15;
+      letter-spacing: 0.08em;
+      font-weight: 800;
+      text-shadow: 0 8px 28px rgba(70, 0, 0, 0.28);
+    }
+
+    .front-subtitle {
+      margin-top: 20px;
+      font-size: 16px;
+      letter-spacing: 0.16em;
+      color: #fff1c6;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 247, 235, 0.96)),
+        radial-gradient(circle at top, #ffe1b1, transparent 42%);
+      padding: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .message-box {
+      width: 100%;
+      min-height: 100%;
+      border-radius: 22px;
+      border: 1px solid rgba(217, 164, 65, 0.5);
+      background: rgba(255, 255, 255, 0.62);
+      padding: 36px 28px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: inset 0 0 40px rgba(217, 164, 65, 0.08);
+    }
+
+    .dear {
+      font-size: 18px;
+      color: var(--deep-red);
+      margin-bottom: 18px;
+    }
+
+    .recipient {
+      display: block;
+      margin-top: 8px;
+      font-size: clamp(30px, 7vw, 44px);
+      font-weight: 800;
+      color: var(--main-red);
+      letter-spacing: 0.04em;
+    }
+
+    .message {
+      margin: 24px auto 0;
+      max-width: 300px;
+      font-size: 20px;
+      line-height: 1.75;
+      font-weight: 500;
+    }
+
+    .signature {
+      margin-top: 34px;
+      color: #9a6d32;
+      font-size: 14px;
+      letter-spacing: 0.12em;
+    }
+
+    .button-like {
+      margin-top: 28px;
+      align-self: center;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: #fff0d2;
+      color: var(--deep-red);
+      font-size: 14px;
+      border: 1px solid rgba(217, 164, 65, 0.5);
+    }
+
+    @media (max-width: 480px) {
+      :root {
+        --card-height: 520px;
+      }
+
+      .hint {
+        top: 14px;
+        font-size: 13px;
+      }
+
+      .card-back {
+        padding: 24px;
+      }
+
+      .message-box {
+        padding: 30px 22px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-inner {
+        transition: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="bg"></canvas>
+
+  <main class="page">
+    <div class="hint">點擊卡片打開祝福</div>
+
+    <section class="card" id="card" aria-label="祝賀卡片，點擊可翻轉" tabindex="0">
+      <div class="card-inner">
+        <article class="card-face card-front">
+          <div class="front-frame">
+            <div>
+              <div class="front-title">祝福卡</div>
+              <div class="front-subtitle">CLICK TO OPEN</div>
+            </div>
+          </div>
+        </article>
+
+        <article class="card-face card-back">
+          <div class="message-box">
+            <div class="dear">
+              Dear
+              <span class="recipient" id="recipientName">親愛的夥伴</span>
+            </div>
+
+            <p class="message" id="greetingMessage">
+              願你今天充滿笑容、驚喜與溫暖，所有美好的事情都剛剛好發生。
+            </p>
+
+            <div class="signature">WITH BEST WISHES</div>
+            <div class="button-like">再次點擊可翻回封面</div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js";
+
+    const card = document.querySelector("#card");
+    const recipientName = document.querySelector("#recipientName");
+    const greetingMessage = document.querySelector("#greetingMessage");
+
+    function getLinkParams() {
+      const hash = window.location.hash.startsWith("#")
+        ? window.location.hash.slice(1)
+        : "";
+
+      const query = window.location.search.startsWith("?")
+        ? window.location.search.slice(1)
+        : "";
+
+      return new URLSearchParams(hash || query);
+    }
+
+    function base64UrlDecodeToJson(value) {
+      const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
+      const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+      const binary = atob(padded);
+      const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+      return JSON.parse(new TextDecoder().decode(bytes));
+    }
+
+    function cleanText(value, fallback, maxLength) {
+      const text = String(value || fallback)
+        .replace(/[\u0000-\u001F\u007F]/g, "")
+        .trim();
+
+      return text.slice(0, maxLength);
+    }
+
+    function applyGreetingFromUrl() {
+      const params = getLinkParams();
+
+      let data = {
+        name: params.get("name"),
+        msg: params.get("msg")
+      };
+
+      const payload = params.get("p");
+
+      if (payload) {
+        try {
+          data = base64UrlDecodeToJson(payload);
+        } catch (error) {
+          console.warn("Invalid payload:", error);
+        }
+      }
+
+      recipientName.textContent = cleanText(data.name, "親愛的夥伴", 30);
+      greetingMessage.textContent = cleanText(
+        data.msg,
+        "願你今天充滿笑容、驚喜與溫暖，所有美好的事情都剛剛好發生。",
+        120
+      );
+    }
+
+    applyGreetingFromUrl();
+
+    card.addEventListener("click", () => {
+      card.classList.toggle("is-flipped");
+    });
+
+    card.addEventListener("keydown", event => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        card.classList.toggle("is-flipped");
+      }
+    });
+
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    const canvas = document.querySelector("#bg");
+    const renderer = new THREE.WebGLRenderer({
+      canvas,
+      antialias: true,
+      alpha: true
+    });
+
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+
+    const camera = new THREE.PerspectiveCamera(
+      45,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      100
+    );
+
+    camera.position.set(0, 0, 8);
+
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.8);
+    directionalLight.position.set(4, 6, 8);
+    scene.add(directionalLight);
+
+    const balloons = [];
+    const confetti = [];
+
+    const balloonColors = [
+      0xff6f61,
+      0xffc857,
+      0x7bdff2,
+      0xb2f7ef,
+      0xf7aef8,
+      0xcdb4db
+    ];
+
+    function createBalloon(color) {
+      const group = new THREE.Group();
+
+      const bodyGeometry = new THREE.SphereGeometry(0.45, 32, 32);
+      bodyGeometry.scale(0.86, 1.16, 0.86);
+
+      const material = new THREE.MeshStandardMaterial({
+        color,
+        roughness: 0.38,
+        metalness: 0.04
+      });
+
+      const body = new THREE.Mesh(bodyGeometry, material);
+      group.add(body);
+
+      const knot = new THREE.Mesh(
+        new THREE.ConeGeometry(0.12, 0.22, 18),
+        material
+      );
+
+      knot.position.y = -0.58;
+      knot.rotation.x = Math.PI;
+      group.add(knot);
+
+      const stringCurve = new THREE.CatmullRomCurve3([
+        new THREE.Vector3(0, -0.7, 0),
+        new THREE.Vector3(0.08, -1.05, 0),
+        new THREE.Vector3(-0.06, -1.42, 0),
+        new THREE.Vector3(0.05, -1.82, 0)
+      ]);
+
+      const stringGeometry = new THREE.BufferGeometry().setFromPoints(
+        stringCurve.getPoints(28)
+      );
+
+      const string = new THREE.Line(
+        stringGeometry,
+        new THREE.LineBasicMaterial({
+          color: 0xffffff,
+          transparent: true,
+          opacity: 0.7
+        })
+      );
+
+      group.add(string);
+
+      return group;
+    }
+
+    function createConfettiPiece() {
+      const geometry = new THREE.PlaneGeometry(0.055, 0.16);
+      const material = new THREE.MeshBasicMaterial({
+        color: balloonColors[Math.floor(Math.random() * balloonColors.length)],
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.86
+      });
+
+      return new THREE.Mesh(geometry, material);
+    }
+
+    for (let i = 0; i < 18; i++) {
+      const balloon = createBalloon(balloonColors[i % balloonColors.length]);
+
+      const baseX = (Math.random() - 0.5) * 9.5;
+      const baseY = (Math.random() - 0.5) * 7.5;
+
+      balloon.position.set(baseX, baseY, -2 - Math.random() * 3);
+      balloon.scale.setScalar(0.72 + Math.random() * 0.55);
+
+      balloon.userData = {
+        baseX,
+        baseY,
+        speed: 0.25 + Math.random() * 0.45,
+        drift: 0.4 + Math.random() * 0.7,
+        phase: Math.random() * Math.PI * 2
+      };
+
+      balloons.push(balloon);
+      scene.add(balloon);
+    }
+
+    for (let i = 0; i < 130; i++) {
+      const piece = createConfettiPiece();
+
+      const baseX = (Math.random() - 0.5) * 10;
+      const baseY = (Math.random() - 0.5) * 8;
+
+      piece.position.set(baseX, baseY, -1 - Math.random() * 4);
+      piece.rotation.set(
+        Math.random() * Math.PI,
+        Math.random() * Math.PI,
+        Math.random() * Math.PI
+      );
+
+      piece.userData = {
+        baseX,
+        baseY,
+        fallSpeed: 0.004 + Math.random() * 0.012,
+        spinSpeed: 0.012 + Math.random() * 0.035,
+        drift: 0.4 + Math.random(),
+        phase: Math.random() * Math.PI * 2
+      };
+
+      confetti.push(piece);
+      scene.add(piece);
+    }
+
+    const clock = new THREE.Clock();
+
+    function resizeRenderer() {
+      const width = window.innerWidth;
+      const height = window.innerHeight;
+
+      renderer.setSize(width, height, false);
+      camera.aspect = width / height;
+      camera.updateProjectionMatrix();
+    }
+
+    window.addEventListener("resize", resizeRenderer);
+    resizeRenderer();
+
+    function animate() {
+      const time = clock.getElapsedTime();
+
+      if (!reduceMotion) {
+        for (const balloon of balloons) {
+          const data = balloon.userData;
+
+          balloon.position.x = data.baseX + Math.sin(time * data.drift + data.phase) * 0.35;
+          balloon.position.y += 0.006 * data.speed;
+
+          if (balloon.position.y > 4.8) {
+            balloon.position.y = -4.8;
+          }
+
+          balloon.rotation.z = Math.sin(time * 0.8 + data.phase) * 0.08;
+        }
+
+        for (const piece of confetti) {
+          const data = piece.userData;
+
+          piece.position.x = data.baseX + Math.sin(time * data.drift + data.phase) * 0.45;
+          piece.position.y -= data.fallSpeed;
+
+          if (piece.position.y < -4.5) {
+            piece.position.y = 4.5;
+          }
+
+          piece.rotation.x += data.spinSpeed;
+          piece.rotation.y += data.spinSpeed * 0.7;
+          piece.rotation.z += data.spinSpeed * 0.45;
+        }
+      }
+
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+
+    animate();
+  </script>
+</body>
+</html>
