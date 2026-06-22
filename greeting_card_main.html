@@ -8,13 +8,20 @@
 
   <style>
     :root {
-      --card-width: min(88vw, 420px);
-      --card-height: 560px;
-      --main-red: #d94f4f;
-      --deep-red: #9f2f38;
+      --card-width: min(92vw, 480px);
+      --card-height: min(69vw, 360px);
+      /* --card-height: 560px; */
+      --main-blue: #4f68d9;
+      --deep-blue: #2f359f;
       --cream: #fff7eb;
       --gold: #d9a441;
-      --text: #3f2f2f;
+      --text: #2f323f;
+      --primary-blue: #537bff;
+      --orange: #ffab4a;
+      --yellow: #ffec40;
+      --green: #a7fc58;
+      --blue: #54ddff;
+      --purple: #9b80fc;
     }
 
     * {
@@ -26,10 +33,7 @@
       min-height: 100vh;
       font-family: "Microsoft JhengHei", "Noto Sans TC", Arial, sans-serif;
       color: var(--text);
-      background:
-        radial-gradient(circle at top left, #ffe3d3 0, transparent 30%),
-        radial-gradient(circle at bottom right, #f9c7c0 0, transparent 32%),
-        linear-gradient(135deg, #fff4df, #ffe3e3);
+      background-image: linear-gradient(to right top, #f8c6e3, #f0cbec, #e8cff4, #dfd4f9, #d7d9fc, #d0deff, #cae2ff, #c6e6ff, #c1ebff, #bff0fd, #bff4fa, #c2f8f5);
       overflow: hidden;
     }
 
@@ -104,7 +108,8 @@
       padding: 34px;
       background:
         radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.42), transparent 28%),
-        linear-gradient(160deg, #ef6a62, #b93646 62%, #822634);
+        linear-gradient(160deg, #4f68d9, #537bff 62%, #2f359f);
+        /* linear-gradient(160deg, #ef6a62, #b93646 62%, #822634); */
       color: white;
     }
 
@@ -160,8 +165,7 @@
       background:
         linear-gradient(180deg, rgba(255, 255, 255, 0.88), rgba(255, 247, 235, 0.96)),
         radial-gradient(circle at top, #ffe1b1, transparent 42%);
-      padding: 32px;
-      display: flex;
+      padding: 28px;
       align-items: center;
       justify-content: center;
     }
@@ -169,61 +173,61 @@
     .message-box {
       width: 100%;
       min-height: 100%;
+      max-height: 100%;
       border-radius: 22px;
       border: 1px solid rgba(217, 164, 65, 0.5);
       background: rgba(255, 255, 255, 0.62);
-      padding: 36px 28px;
+      padding: 28px 28px;
       text-align: center;
-      display: flex;
-      flex-direction: column;
       justify-content: center;
       box-shadow: inset 0 0 40px rgba(217, 164, 65, 0.08);
     }
 
     .dear {
       font-size: 18px;
-      color: var(--deep-red);
+      color: var(--deep-blue);
       margin-bottom: 18px;
     }
 
     .recipient {
       display: block;
-      margin-top: 8px;
       font-size: clamp(30px, 7vw, 44px);
       font-weight: 800;
-      color: var(--main-red);
-      letter-spacing: 0.04em;
+      color: var(--main-blue);
+      letter-spacing: 0.05em;
     }
 
     .message {
-      margin: 24px auto 0;
+      margin: 10px auto 0;
       max-width: 300px;
-      font-size: 20px;
-      line-height: 1.75;
+      font-size: auto;
+      line-height: 1.5;
       font-weight: 500;
     }
 
     .signature {
-      margin-top: 34px;
+      margin-top: 20px;
       color: #9a6d32;
       font-size: 14px;
       letter-spacing: 0.12em;
     }
 
     .button-like {
-      margin-top: 28px;
+      margin-top: 10px;
+      margin-left: 20%;
+      margin-right: 20%;
       align-self: center;
-      padding: 10px 18px;
+      padding: 10px 10px;
       border-radius: 999px;
       background: #fff0d2;
-      color: var(--deep-red);
+      color: var(--deep-blue);
       font-size: 14px;
       border: 1px solid rgba(217, 164, 65, 0.5);
     }
 
     @media (max-width: 480px) {
       :root {
-        --card-height: 520px;
+        --card-height: 360px;
       }
 
       .hint {
@@ -232,11 +236,11 @@
       }
 
       .card-back {
-        padding: 24px;
+        padding: 20px;
       }
 
       .message-box {
-        padding: 30px 22px;
+        padding: 20px 22px;
       }
     }
 
@@ -252,7 +256,7 @@
   <canvas id="bg"></canvas>
 
   <main class="page">
-    <div class="hint">點擊卡片打開祝福</div>
+    <!--div class="hint">點擊卡片打開祝福</div-->
 
     <section class="card" id="card" aria-label="祝賀卡片，點擊可翻轉" tabindex="0">
       <div class="card-inner">
@@ -272,6 +276,7 @@
               <span class="recipient" id="recipientName">親愛的夥伴</span>
             </div>
 
+            <!-- 含標點符號、英數字，最多30字 -->
             <p class="message" id="greetingMessage">
               願你今天充滿笑容、驚喜與溫暖，所有美好的事情都剛剛好發生。
             </p>
@@ -285,35 +290,35 @@
   </main>
 
   <script type="module">
-    import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js";
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.184.0/build/three.module.js';
 
-    const card = document.querySelector("#card");
-    const recipientName = document.querySelector("#recipientName");
-    const greetingMessage = document.querySelector("#greetingMessage");
+    const card = document.querySelector('#card');
+    const recipientName = document.querySelector('#recipientName');
+    const greetingMessage = document.querySelector('#greetingMessage');
 
     function getLinkParams() {
-      const hash = window.location.hash.startsWith("#")
+      const hash = window.location.hash.startsWith('#')
         ? window.location.hash.slice(1)
-        : "";
+        : '';
 
-      const query = window.location.search.startsWith("?")
+      const query = window.location.search.startsWith('?')
         ? window.location.search.slice(1)
-        : "";
+        : '';
 
       return new URLSearchParams(hash || query);
     }
 
     function base64UrlDecodeToJson(value) {
-      const base64 = value.replace(/-/g, "+").replace(/_/g, "/");
-      const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, "=");
+      const base64 = value.replace(/-/g, '+').replace(/_/g, '/');
+      const padded = base64.padEnd(Math.ceil(base64.length / 4) * 4, '=');
       const binary = atob(padded);
-      const bytes = Uint8Array.from(binary, char => char.charCodeAt(0));
+      const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
       return JSON.parse(new TextDecoder().decode(bytes));
     }
 
     function cleanText(value, fallback, maxLength) {
       const text = String(value || fallback)
-        .replace(/[\u0000-\u001F\u007F]/g, "")
+        .replace(/[\u0000-\u001F\u007F]/g, '')
         .trim();
 
       return text.slice(0, maxLength);
@@ -323,48 +328,50 @@
       const params = getLinkParams();
 
       let data = {
-        name: params.get("name"),
-        msg: params.get("msg")
+        name: params.get('name'),
+        msg: params.get('msg'),
       };
 
-      const payload = params.get("p");
+      const payload = params.get('p');
 
       if (payload) {
         try {
           data = base64UrlDecodeToJson(payload);
         } catch (error) {
-          console.warn("Invalid payload:", error);
+          console.warn('Invalid payload:', error);
         }
       }
 
-      recipientName.textContent = cleanText(data.name, "親愛的夥伴", 30);
+      recipientName.textContent = cleanText(data.name, '親愛的夥伴', 30);
       greetingMessage.textContent = cleanText(
         data.msg,
-        "願你今天充滿笑容、驚喜與溫暖，所有美好的事情都剛剛好發生。",
-        120
+        '願你今天充滿笑容、驚喜與溫暖，所有美好的事情都剛剛好發生。',
+        120,
       );
     }
 
     applyGreetingFromUrl();
 
-    card.addEventListener("click", () => {
-      card.classList.toggle("is-flipped");
+    card.addEventListener('click', () => {
+      card.classList.toggle('is-flipped');
     });
 
-    card.addEventListener("keydown", event => {
-      if (event.key === "Enter" || event.key === " ") {
+    card.addEventListener('keydown', (event) => {
+      if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        card.classList.toggle("is-flipped");
+        card.classList.toggle('is-flipped');
       }
     });
 
-    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const reduceMotion = window.matchMedia(
+      '(prefers-reduced-motion: reduce)',
+    ).matches;
 
-    const canvas = document.querySelector("#bg");
+    const canvas = document.querySelector('#bg');
     const renderer = new THREE.WebGLRenderer({
       canvas,
       antialias: true,
-      alpha: true
+      alpha: true,
     });
 
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
@@ -375,7 +382,7 @@
       45,
       window.innerWidth / window.innerHeight,
       0.1,
-      100
+      100,
     );
 
     camera.position.set(0, 0, 8);
@@ -391,12 +398,29 @@
     const confetti = [];
 
     const balloonColors = [
-      0xff6f61,
-      0xffc857,
-      0x7bdff2,
-      0xb2f7ef,
-      0xf7aef8,
-      0xcdb4db
+      0xff5353,
+      0xffab4a,
+      0xffec40,
+      0xa7fc58,
+      0x54ddff,
+      0x9b80fc,
+    ];
+
+    const balloonColors_correct = [
+      0xff5353,
+      0xffab4a,
+      0xffec40,
+      0xa7fc58,
+      0x54ddff,
+      0x9b80fc,
+    ];
+
+    const balloonColors_light = [
+      0xF5A7A6,
+      0xF5CF9F,
+      0xF3F5A9,
+      0xD0E4EE,
+      0xD5D1E9,
     ];
 
     function createBalloon(color) {
@@ -407,19 +431,18 @@
 
       const material = new THREE.MeshStandardMaterial({
         color,
+        transparent: true,
         roughness: 0.38,
-        metalness: 0.04
+        metalness: 0.04,
+        opacity: 0.85,
       });
 
       const body = new THREE.Mesh(bodyGeometry, material);
       group.add(body);
 
-      const knot = new THREE.Mesh(
-        new THREE.ConeGeometry(0.12, 0.22, 18),
-        material
-      );
+      const knot = new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.15, 40), material);
 
-      knot.position.y = -0.58;
+      knot.position.y = -0.52;
       knot.rotation.x = Math.PI;
       group.add(knot);
 
@@ -427,11 +450,11 @@
         new THREE.Vector3(0, -0.7, 0),
         new THREE.Vector3(0.08, -1.05, 0),
         new THREE.Vector3(-0.06, -1.42, 0),
-        new THREE.Vector3(0.05, -1.82, 0)
+        new THREE.Vector3(0.05, -1.82, 0),
       ]);
 
       const stringGeometry = new THREE.BufferGeometry().setFromPoints(
-        stringCurve.getPoints(28)
+        stringCurve.getPoints(28),
       );
 
       const string = new THREE.Line(
@@ -439,8 +462,8 @@
         new THREE.LineBasicMaterial({
           color: 0xffffff,
           transparent: true,
-          opacity: 0.7
-        })
+          opacity: 0.7,
+        }),
       );
 
       group.add(string);
@@ -454,7 +477,7 @@
         color: balloonColors[Math.floor(Math.random() * balloonColors.length)],
         side: THREE.DoubleSide,
         transparent: true,
-        opacity: 0.86
+        opacity: 0.86,
       });
 
       return new THREE.Mesh(geometry, material);
@@ -463,7 +486,7 @@
     for (let i = 0; i < 18; i++) {
       const balloon = createBalloon(balloonColors[i % balloonColors.length]);
 
-      const baseX = (Math.random() - 0.5) * 9.5;
+      const baseX = (Math.random() - 0.5) * 20;
       const baseY = (Math.random() - 0.5) * 7.5;
 
       balloon.position.set(baseX, baseY, -2 - Math.random() * 3);
@@ -474,7 +497,7 @@
         baseY,
         speed: 0.25 + Math.random() * 0.45,
         drift: 0.4 + Math.random() * 0.7,
-        phase: Math.random() * Math.PI * 2
+        phase: Math.random() * Math.PI * 2,
       };
 
       balloons.push(balloon);
@@ -491,7 +514,7 @@
       piece.rotation.set(
         Math.random() * Math.PI,
         Math.random() * Math.PI,
-        Math.random() * Math.PI
+        Math.random() * Math.PI,
       );
 
       piece.userData = {
@@ -500,7 +523,7 @@
         fallSpeed: 0.004 + Math.random() * 0.012,
         spinSpeed: 0.012 + Math.random() * 0.035,
         drift: 0.4 + Math.random(),
-        phase: Math.random() * Math.PI * 2
+        phase: Math.random() * Math.PI * 2,
       };
 
       confetti.push(piece);
@@ -518,7 +541,7 @@
       camera.updateProjectionMatrix();
     }
 
-    window.addEventListener("resize", resizeRenderer);
+    window.addEventListener('resize', resizeRenderer);
     resizeRenderer();
 
     function animate() {
@@ -528,11 +551,12 @@
         for (const balloon of balloons) {
           const data = balloon.userData;
 
-          balloon.position.x = data.baseX + Math.sin(time * data.drift + data.phase) * 0.35;
+          balloon.position.x =
+            data.baseX + Math.sin(time * data.drift + data.phase) * 0.35;
           balloon.position.y += 0.006 * data.speed;
 
-          if (balloon.position.y > 4.8) {
-            balloon.position.y = -4.8;
+          if (balloon.position.y > 5.8) {
+            balloon.position.y = -5.8;
           }
 
           balloon.rotation.z = Math.sin(time * 0.8 + data.phase) * 0.08;
@@ -541,7 +565,8 @@
         for (const piece of confetti) {
           const data = piece.userData;
 
-          piece.position.x = data.baseX + Math.sin(time * data.drift + data.phase) * 0.45;
+          piece.position.x =
+            data.baseX + Math.sin(time * data.drift + data.phase) * 0.45;
           piece.position.y -= data.fallSpeed;
 
           if (piece.position.y < -4.5) {

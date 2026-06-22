@@ -1,0 +1,28 @@
+{
+  "devDependencies": {
+    "vite": "^8.0.16"
+  },
+  "dependencies": {
+    "three": "^0.184.0"
+  },
+  "name": "greeting-card",
+  "version": "1.0.0",
+  "description": "Show the Greeting Card with Three.js",
+  "main": "index.js",
+  "scripts": {
+    "dev":"vite",
+    "build": "vite build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/snowmint/Greeting-Card.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/snowmint/Greeting-Card/issues"
+  },
+  "homepage": "https://github.com/snowmint/Greeting-Card#readme"
+}
